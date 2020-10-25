@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,13 +11,24 @@ public class PlayerScript : MonoBehaviour
     private Rigidbody2D rd2d;
     public float speed;
     public Text score;
+    public Text winText; 
     private int scoreValue = 0;
+    public Text lives;
+    private int livesText = 3;
+    public AudioSource musicSource;
+    public AudioClip musicClipOne;
+    public AudioClip musicClipTwo;
 
     // Start is called before the first frame update
     void Start()
     {
         rd2d = GetComponent<Rigidbody2D>();
         score.text = scoreValue.ToString();
+        winText.text = "";
+        livesText = 3;
+        lives.text = "Lives: " + livesText.ToString();
+        musicSource.clip = musicClipOne;
+        musicSource.Play();
     }
 
     // Update is called once per frame
@@ -40,6 +52,38 @@ public class PlayerScript : MonoBehaviour
             scoreValue += 1;
             score.text = scoreValue.ToString();
             Destroy(collision.collider.gameObject);
+
+            if (scoreValue == 4)
+            {
+                transform.position = new Vector2(42.5f, 0.0f);
+                livesText = 3;
+                lives.text = "Lives: " + livesText.ToString();
+            }
+
+            if (scoreValue == 8)
+            {
+                winText.text = "You Win! Game created by Brenden Fairchild.";
+            }
+
+            if (scoreValue == 8)
+            {
+                musicSource.Stop();
+                musicSource.clip = musicClipTwo;
+                musicSource.Play();
+            }
+        }
+
+        if (collision.collider.tag == "Enemy")
+        {
+            livesText -= 1;
+            lives.text = "Lives: " + livesText.ToString();
+            Destroy(collision.collider.gameObject);
+
+            if (livesText == 0)
+            {
+                winText.text = "You lose! Game made by Brenden Fairchild.";
+                Destroy(this.gameObject);
+            }
         }
     }
 
